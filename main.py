@@ -1,3 +1,10 @@
+import base64
+import os
+
+cookies_b64 = os.getenv("YT_COOKIES_B64")
+if cookies_b64:
+    with open("cookies.txt", "wb") as f:
+        f.write(base64.b64decode(cookies_b64))
 import asyncio
 import ctypes.util
 import glob
