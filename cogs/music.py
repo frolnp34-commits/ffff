@@ -5,6 +5,16 @@ import discord
 import yt_dlp
 from discord import app_commands
 from discord.ext import commands
+import re
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+spotify_client_id = os.getenv("SPOTIFY_CLIENT_ID")
+spotify_client_secret = os.getenv("SPOTIFY_CLIENT_SECRET")
+
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+    client_id=spotify_client_id,
+    client_secret=spotify_client_secret
+))
 
 log = logging.getLogger("bot.music")
 
@@ -21,7 +31,28 @@ YDL_OPTS = {
         }
     },
 }
+def get_youtube_query_from_spotify(url: str) -> str:
+    if "spotify.com/track/" not in url:
+        return url
 
+    match = re.search(r"track/([a-zA-Z0-9]+)", url)
+    if not match:
+        return url
+
+    track_id = match.group(1)
+    try:
+        track_info = sp.track(track_id)
+        artist_name = track_info['artists'][0]['name']
+        song_name = track_info['name']
+        return f"ytsearch:{artist_name} - {song_name}"
+    except Exception as e:
+        print(f"Ошибка Spotify: {e}")
+        return url
+
+@commands.command()
+async def play(self, ctx, url: str):
+    url = get_youtube_query_from_spotify(url)
+    
 FFMPEG_OPTS = {
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
     "options": "-vn",
