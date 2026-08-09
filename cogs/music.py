@@ -49,9 +49,7 @@ def get_youtube_query_from_spotify(url: str) -> str:
         print(f"Ошибка Spotify: {e}")
         return url
 
-@commands.command()
-async def play(self, ctx, url: str):
-    url = get_youtube_query_from_spotify(url)
+
     
 FFMPEG_OPTS = {
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
@@ -192,6 +190,7 @@ class Music(commands.Cog):
             state.voice_client = await interaction.user.voice.channel.connect()
 
         try:
+            query = get_youtube_query_from_spotify(query)
             track = await self.search(query)
         except Exception as e:
             await interaction.followup.send(f"Не удалось найти трек: {e}")
