@@ -1,5 +1,0 @@
-[phases.setup]
-aptPkgs = ["ffmpeg", "libopus0"]
-
-[start]
-cmd = "python main.py"
