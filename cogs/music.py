@@ -32,24 +32,49 @@ YDL_OPTS = {
     },
 }
 def get_youtube_query_from_spotify(url: str) -> str:
-    if "spotify.com/track/" not in url:
+    if "spotify.com" not in url:
         return url
 
-    match = re.search(r"track/([a-zA-Z0-9]+)", url)
-    if not match:
-        return url
-
-    track_id = match.group(1)
     try:
-        track_info = sp.track(track_id)
-        artist_name = track_info['artists'][0]['name']
-        song_name = track_info['name']
-        return f"ytsearch:{artist_name} - {song_name}"
+        if "playlist/" in url or "album/" in url:
+            match = re.search(r"(playlist|album)/([a-zA-Z0-9]+)", url)
+            if not match:
+                return url
+            
+            playlist_id = match.group(2)
+            if "playlist" in url:
+                results = sp.playlist_tracks(playlist_id, limit=1)
+                if results['items']:
+                    track_info = results['items'][0]['track']
+                else:
+                    return url
+            else:
+                results = sp.album_tracks(playlist_id, limit=1)
+                if results['items']:
+                    track_info = results['items'][0]
+                else:
+                    return url
+            
+            artist_name = track_info['artists'][0]['name']
+            song_name = track_info['name']
+            return f"ytsearch:{artist_name} - {song_name}"
+
+        elif "track/" in url:
+            match = re.search(r"track/([a-zA-Z0-9]+)", url)
+            if not match:
+                return url
+            
+            track_id = match.group(1)
+            track_info = sp.track(track_id)
+            artist_name = track_info['artists'][0]['name']
+            song_name = track_info['name']
+            return f"ytsearch:{artist_name} - {song_name}"
+
     except Exception as e:
         print(f"Ошибка Spotify: {e}")
         return url
 
-
+    return url
     
 FFMPEG_OPTS = {
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
