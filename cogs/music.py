@@ -14,9 +14,7 @@ YDL_OPTS = {
     "quiet": True,
     "default_search": "ytsearch",
     "source_address": "0.0.0.0",
-    # YouTube часто блокирует запросы с "облачных" IP (датацентры вроде Railway,
-    # Render и т.п.), требуя подтвердить, что ты не бот. Мобильный/TV клиент
-    # обычно обходит эту проверку без необходимости передавать cookies.
+    "cookiefile": "cookies.txt",
     "extractor_args": {
         "youtube": {
             "player_client": ["android", "tv", "web"],
