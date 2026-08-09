@@ -1,6 +1,0 @@
-[phases.setup]
-nixPkgs = ["...", "opus"]
-aptPkgs = ["ffmpeg", "libopus0"]
-
-[start]
-cmd = "python main.py"
